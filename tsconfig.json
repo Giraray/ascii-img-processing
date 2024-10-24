@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+      "lib": ["ESNext", "dom"],
+      "types": [
+        "vite/client",
+        "@webgpu/types"
+    ]
+    }
+  }

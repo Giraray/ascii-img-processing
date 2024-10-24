@@ -1,0 +1,21 @@
+body {
+    background-color: #351111;
+    margin: 0;
+}
+
+#bg {
+    border: solid red 1px;
+    margin: 10px;
+}
+
+.block {
+    display: block;
+}
+
+textarea {
+    width: 100vw;
+    height: 1000px;
+    background-color: #000;
+    color: white;
+    margin: 5px;
+}
