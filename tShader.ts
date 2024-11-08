@@ -27,7 +27,7 @@ export default class AsciiShader extends ShaderObject {
     createInstructions(time: number, width: number, height: number): ProgramInstructions {
         // buffer for compute
         const colorBuffer = this.device.createTexture({
-            size: {width,height},
+            size: {width: width/8, height: height/8},
             format: 'rgba8unorm',
             usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC |
              GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING,
@@ -84,6 +84,7 @@ export default class AsciiShader extends ShaderObject {
             {binding: 0, resource: colorBuffer.createView()},
             {binding: 1, resource: this.texture.createView()},
             {binding: 2, resource: { buffer: threshBuffer }},
+            {binding: 3, resource: { buffer: resBuffer }},
         ];
 
         // FINALIZE

@@ -27,6 +27,7 @@ async function loadTexture(url) {
     const res = await fetch(url);
     const blob = await res.blob();
     const source = await createImageBitmap(blob, {colorSpaceConversion: 'none'});
+    console.log(blob)
     return source;
 }
 

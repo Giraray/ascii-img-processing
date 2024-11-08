@@ -102,11 +102,15 @@ fn frag_main(
 
     // here it starts
     var fragCoord = pos.xy;
+    var bitmapCoord = floor(fragCoord/8);
+    var bitmapRes = uResolution/8;
+    var bitmapUV = bitmapCoord / bitmapRes;
+
+    var edges = textureSample(colorBuffer, uSampler, uv);
+
     var pixel = compressUV(8.0, fragCoord);
     var pixelTex = textureSample(uTexture, uSampler, pixel);
     var luma = getQuantizedLuma(pixelTex);
-
-    var edges = textureSample(colorBuffer, uSampler, uv);
 
     var color: vec4<f32>;
     if(vec3Equals(edges.rgb, vec3(0.0))) {

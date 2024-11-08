@@ -1,6 +1,7 @@
 @group(0) @binding(0) var colorBuffer: texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(1) var uTexture: texture_2d<f32>;
 @group(0) @binding(2) var<uniform> uThreshold: f32;
+@group(0) @binding(3) var<uniform> uResolution: vec2<f32>;
 
 var<workgroup> tile : array<array<vec3<f32>, 8>, 8>;
 const red = vec3(1.0,0.0,0.0);
@@ -15,10 +16,19 @@ fn vec4Equals(a: vec4<f32>, b: vec4<f32>) -> bool {
     return true;
 }
 
+fn vec3EqualsU32(a: vec3<u32>, b: vec3<u32>) -> bool {
+    var boolVec = a == b;
+    if(boolVec.x == false || boolVec.y == false || boolVec.z == false) {
+        return false;
+    }
+    return true;
+}
+
 @compute @workgroup_size(8,8,1)
 fn main(
     @builtin(global_invocation_id) global_id: vec3<u32>,
-    @builtin(local_invocation_id) local_id: vec3<u32>
+    @builtin(local_invocation_id) local_id: vec3<u32>,
+    @builtin(workgroup_id) wg_id: vec3<u32>
     ) {
 
     let screenPos: vec2<i32> = vec2(i32(global_id.x), i32(global_id.y));
@@ -49,10 +59,10 @@ fn main(
     var color = vec4(0.0,0.0,0.0, 1.0);
 
     // todo SHOULD optimize performance a little bit by skipping the next steps if there are edges detected. Maybe do that for sobel?
-    if(vec4Equals(histogram, vec4(0.0))) {
-        textureStore(colorBuffer, screenPos, color);
-        return;
-    }
+    // if(vec4Equals(histogram, vec4(0.0))) {
+    //     textureStore(colorBuffer, screenPos, color);
+    //     return;
+    // }
 
     var resultColor = vec3(0.0);
     var max = 0.0;
@@ -77,7 +87,16 @@ fn main(
         color = vec4(resultColor, 1.0);
     }
 
-    var test = vec4(0.2,0.0,0.6,1.0);
 
-    textureStore(colorBuffer, screenPos, color); 
+    // remove
+    if(vec3EqualsU32(wg_id, vec3<u32>(0,0,0))) {
+        color = vec4(yellow, 1.0);
+    }
+
+    var resolution = uResolution;
+
+    // remove
+
+    var bufferPos = vec2(wg_id.x, wg_id.y);
+    textureStore(colorBuffer, bufferPos, color); 
 }

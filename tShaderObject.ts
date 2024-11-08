@@ -153,6 +153,8 @@ export abstract class ShaderObject {
 
                 computePass.dispatchWorkgroups(Math.ceil(w/shader.workgroupSize), Math.ceil(h/shader.workgroupSize), 1);
                 computePass.end();
+
+                // console.log(shader.entries.)
             }
         }
     }
