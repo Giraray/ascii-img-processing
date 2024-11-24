@@ -35,6 +35,6 @@ export default class CanvasProcessor {
         await buffer.mapAsync(GPUMapMode.READ);
         const f32Buffer = new Float32Array(buffer.getMappedRange());
 
-        console.log(f32Buffer);
+        // console.log(f32Buffer);
     }
 }

@@ -101,20 +101,21 @@ fn frag_main(
     var resolution = uResolution; // wtf just make a bindgroup layout man...
 
     // here it starts
-    var fragCoord = pos.xy;
-    var bitmapCoord = floor(fragCoord/8);
-    var bitmapRes = uResolution/8;
-    var bitmapUV = bitmapCoord / bitmapRes;
+    var fragCoord = vec2(i32(pos.x/8), i32(pos.y/8));
+    // var bitmapCoord = floor(fragCoord/8);
+    // var bitmapRes = uResolution/8;
+    // var bitmapUV = bitmapCoord / bitmapRes;
 
-    var edges = textureSample(colorBuffer, uSampler, uv);
+    var edges = textureLoad(colorBuffer, fragCoord, 0);
+    var jidoeijo = textureSample(uTexture, uSampler, uv);
 
-    var pixel = compressUV(8.0, fragCoord);
-    var pixelTex = textureSample(uTexture, uSampler, pixel);
-    var luma = getQuantizedLuma(pixelTex);
+    // var pixel = compressUV(8.0, fragCoord);
+    // var pixelTex = textureSample(uTexture, uSampler, pixel);
+    // var luma = getQuantizedLuma(pixelTex);
 
     var color: vec4<f32>;
-    if(vec3Equals(edges.rgb, vec3(0.0))) {
-        return vec4(vec3(luma), 1.0);
-    }
+    // if(vec3Equals(edges.rgb, vec3(0.0))) {
+    //     return vec4(vec3(luma), 1.0);
+    // }
     return edges;
 }

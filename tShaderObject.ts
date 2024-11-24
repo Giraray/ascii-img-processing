@@ -21,6 +21,7 @@ export interface ShaderProgram {
     pipeline: GPURenderPipeline | GPUComputePipeline;
     entries: Array<GPUBindGroupEntry>;
     workgroupSize?: number;
+    colorBuffer?: GPUTexture;
 }
 
 export interface ProgramInstructions {
@@ -154,7 +155,18 @@ export abstract class ShaderObject {
                 computePass.dispatchWorkgroups(Math.ceil(w/shader.workgroupSize), Math.ceil(h/shader.workgroupSize), 1);
                 computePass.end();
 
-                // console.log(shader.entries.)
+                const destBuffer = this.device.createBuffer({
+                    size: (w/8)*(h/8),
+                    usage: GPUBufferUsage.COPY_DST},
+                );
+
+                // pass.copyTextureToBuffer(
+                //     {texture: shader.colorBuffer},
+                //     {buffer: destBuffer, bytesPerRow: 256*3},
+                //     {width: (w/8), height: (h/8)}
+                // )
+
+                console.log(shader.colorBuffer);
             }
         }
     }

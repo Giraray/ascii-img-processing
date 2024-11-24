@@ -34,6 +34,7 @@ export default class AsciiShader extends ShaderObject {
         });
 
         const uUsage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
+        const baseTexture = this.texture.createView();
 
         // resolution buffer
         const resBuffer = this.device.createBuffer({size:8, usage: uUsage});
@@ -84,7 +85,7 @@ export default class AsciiShader extends ShaderObject {
             {binding: 0, resource: colorBuffer.createView()},
             {binding: 1, resource: this.texture.createView()},
             {binding: 2, resource: { buffer: threshBuffer }},
-            {binding: 3, resource: { buffer: resBuffer }},
+            {binding: 4, resource: baseTexture},
         ];
 
         // FINALIZE
@@ -140,6 +141,7 @@ export default class AsciiShader extends ShaderObject {
                 pipeline: downscalePipeline,
                 entries: downscaleEntries,
                 workgroupSize: 8,
+                colorBuffer: colorBuffer,
             },
             {
                 // converts edge calculations into ascii edges and converts image luminance into ascii
