@@ -33,6 +33,12 @@ export default class AsciiShader extends ShaderObject {
              GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING,
         });
 
+        const storageBuffer = this.device.createBuffer({
+            size: Math.floor(width/8) * Math.floor(height/8) * 4,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+            label: 'StorageBuffer',
+        });
+
         const uUsage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
         const baseTexture = this.texture.createView();
 
@@ -86,6 +92,7 @@ export default class AsciiShader extends ShaderObject {
             {binding: 1, resource: this.texture.createView()},
             {binding: 2, resource: { buffer: threshBuffer }},
             {binding: 4, resource: baseTexture},
+            {binding: 5, resource: {buffer: storageBuffer}},
         ];
 
         // FINALIZE
@@ -141,15 +148,15 @@ export default class AsciiShader extends ShaderObject {
                 pipeline: downscalePipeline,
                 entries: downscaleEntries,
                 workgroupSize: 8,
-                colorBuffer: colorBuffer,
+                storageBuffer: storageBuffer,
             },
-            {
-                // converts edge calculations into ascii edges and converts image luminance into ascii
-                label: 'ascii finalize',
-                passType: 'render',
-                pipeline: finalizePipeline,
-                entries: finalizeEntries,
-            },
+            // {
+            //     // converts edge calculations into ascii edges and converts image luminance into ascii
+            //     label: 'ascii finalize',
+            //     passType: 'render',
+            //     pipeline: finalizePipeline,
+            //     entries: finalizeEntries,
+            // },
         ];
 
         const instructions: ProgramInstructions = {

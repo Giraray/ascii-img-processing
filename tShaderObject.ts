@@ -21,7 +21,7 @@ export interface ShaderProgram {
     pipeline: GPURenderPipeline | GPUComputePipeline;
     entries: Array<GPUBindGroupEntry>;
     workgroupSize?: number;
-    colorBuffer?: GPUTexture;
+    storageBuffer?: GPUBuffer;
 }
 
 export interface ProgramInstructions {
@@ -48,6 +48,8 @@ export abstract class ShaderObject {
     readonly device: GPUDevice;
     readonly sampler: GPUSampler;
 
+    readBuffer?: Float32Array;
+
     constructor(device: GPUDevice, canvasFormat: GPUTextureFormat) {
         this.device = device;
         this.canvasFormat = canvasFormat;
@@ -69,7 +71,7 @@ export abstract class ShaderObject {
      * I'm sorry, future me.
      * @param options
      */
-    render(options: RenderDescriptor) {
+    async render(options: RenderDescriptor) {
         const w = options.size.width;
         const h = options.size.height;
 
@@ -144,6 +146,9 @@ export abstract class ShaderObject {
             }
             // compute stuff
             else if(shader.passType = 'compute') {
+                const size = Math.floor(w/8) * Math.floor(h/8);
+                console.log(w/8, h/8)
+
                 const bindGroup = this.device.createBindGroup({
                     layout: shader.pipeline.getBindGroupLayout(0),
                     entries: shader.entries,
@@ -155,18 +160,21 @@ export abstract class ShaderObject {
                 computePass.dispatchWorkgroups(Math.ceil(w/shader.workgroupSize), Math.ceil(h/shader.workgroupSize), 1);
                 computePass.end();
 
-                const destBuffer = this.device.createBuffer({
-                    size: (w/8)*(h/8),
-                    usage: GPUBufferUsage.COPY_DST},
+                const readBuffer = this.device.createBuffer({
+                    label: 'readBuffer',
+                    size: size * 4,
+                    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ},
                 );
 
-                // pass.copyTextureToBuffer(
-                //     {texture: shader.colorBuffer},
-                //     {buffer: destBuffer, bytesPerRow: 256*3},
-                //     {width: (w/8), height: (h/8)}
-                // )
+                pass.copyBufferToBuffer(shader.storageBuffer, 0, readBuffer, 0, size * 4);
+                this.device.queue.submit([pass.finish()]);
 
-                console.log(shader.colorBuffer);
+                await Promise.all([
+                    readBuffer.mapAsync(GPUMapMode.READ),
+                ]);
+                const result = new Float32Array(readBuffer.getMappedRange());
+                this.readBuffer = result;
+                console.log(result);
             }
         }
     }

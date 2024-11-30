@@ -1,7 +1,7 @@
-@group(0) @binding(0) var colorBuffer: texture_storage_2d<rgba8unorm, write>;
+@group(0) @binding(0) var<storage, read_write> storageBuffer: array<f32>;
 @group(0) @binding(1) var uTexture: texture_2d<f32>;
 @group(0) @binding(2) var<uniform> uThreshold: f32;
-@group(0) @binding(4) var uBaseTexture: texture_2d<f32>;
+@group(0) @binding(3) var uBaseTexture: texture_2d<f32>;
 
 var<workgroup> tile : array<array<vec3<f32>, 8>, 8>;
 var<workgroup> texTile : array<array<vec3<f32>, 8>, 8>;
@@ -84,12 +84,12 @@ fn main(
     var texel = vec4(texVec / 64.0, 1.0);
     texel = vec4(vec3(getQuantizedLuma(texel)),1.0);
 
-    var color = vec4(0.0,0.0,0.0, 1.0);
-
     if(vec4Equals(histogram, vec4(0.0))) {
-        textureStore(colorBuffer, wg_id.xy, texel);
+        storageBuffer[wg_id.x * wg_id.y] = texel.x;
         return;
     }
+
+    var color = vec4(0.0,0.0,0.0, 1.0);
 
     var resultColor = vec3(0.0);
     var max = 0.0;
@@ -114,5 +114,5 @@ fn main(
         color = vec4(resultColor, 1.0);
     }
 
-    textureStore(colorBuffer, wg_id.xy, color); 
+    storageBuffer[wg_id.x * wg_id.y] = color.x; 
 }

@@ -16,25 +16,6 @@ export default class CanvasProcessor {
     }
 
     public async convertToText() {
-        const canvas = this.context.canvas;
-        const texture = this.context.getCurrentTexture();
-        const byteLength = 4 * canvas.height * canvas.width;
-
-        const buffer = this.device.createBuffer({
-            size: byteLength,
-            usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-        });
-
-        const encoder = this.device.createCommandEncoder();
-        encoder.copyTextureToBuffer(
-            {texture: texture, origin: [0,0,0]},
-            {buffer: buffer},
-            [canvas.width, canvas.height, 1]
-        );
-
-        await buffer.mapAsync(GPUMapMode.READ);
-        const f32Buffer = new Float32Array(buffer.getMappedRange());
-
-        // console.log(f32Buffer);
+        this.textArea.innerHTML = ":)"
     }
 }
